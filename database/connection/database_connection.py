@@ -4,7 +4,7 @@ connection = psycopg2.connect(
     host="localhost",
     database="supply_chain_db",
     user="postgres",
-    password="0000",
+    password="345waleed",
     port=5432
 )
 
