@@ -20,6 +20,9 @@ from database.scripts.etl_common import (
     read_sheet, make_export_key, clean_text, clean_date, clean_number,
     clean_int, load_export_map, bulk_insert,
 )
+from pathlib import Path
+
+EXCEL_FILE = Path.cwd() / "data" / "Qadri-Group-Logistics-Master.xlsx"
 
 # Container column -> (size, type)
 CONTAINER_MAP = {
@@ -47,7 +50,7 @@ SHIPMENT_COLUMNS = [
 
 
 def load_export_shipments(conn):
-    df = read_sheet("Shipment Master Database")
+    df = read_sheet("Shipment Master Database", EXCEL_FILE)
     export_map = load_export_map(conn)
     shipment_rows = []
     containers_per_row = []   # container tuples for each shipment, in order

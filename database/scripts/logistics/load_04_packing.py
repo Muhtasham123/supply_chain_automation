@@ -19,6 +19,9 @@ from database.scripts.etl_common import (
     read_sheet, make_export_key, clean_text, clean_date, clean_number,
     parse_qty_uom, load_export_map, bulk_insert,
 )
+from pathlib import Path
+
+EXCEL_FILE = Path.cwd() / "data" / "Qadri-Group-Logistics-Master.xlsx"
 
 COLUMNS = [
     "export_id", "exp_batch_raw", "business_type", "product_category",
@@ -33,7 +36,7 @@ COLUMNS = [
 
 
 def load_packing(conn):
-    df = read_sheet("Master Packing Database")
+    df = read_sheet("Master Packing Database", EXCEL_FILE)
     export_map = load_export_map(conn)
     rows = []
     no_key = 0

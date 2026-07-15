@@ -2,9 +2,9 @@ import psycopg2
 
 connection = psycopg2.connect(
     host="localhost",
-    database="supply_chain",
+    database="supply_chain_db",
     user="postgres",
-    password="2023451",
+    password="0000",
     port=5432
 )
 

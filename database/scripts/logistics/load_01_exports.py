@@ -14,6 +14,9 @@ from database.scripts.etl_common import (
     read_sheet, make_export_key, clean_key, clean_text,
     bulk_insert,
 )
+from pathlib import Path
+
+EXCEL_FILE = Path.cwd() / "data" / "Qadri-Group-Logistics-Master.xlsx"
 
 def load_exports(connection):
     consignments = {}   # (exp_no, batch_no) -> dict of attributes
@@ -28,7 +31,7 @@ def load_exports(connection):
             rec["customer"] = customer
 
     # --- Export Documentation (has customer) ------------------------------
-    exp = read_sheet("Export Documentation Database")
+    exp = read_sheet("Export Documentation Database", EXCEL_FILE)
     for _, r in exp.iterrows():
         key = make_export_key(r.get("Exp. #"), r.get("Batch #"))
         register(

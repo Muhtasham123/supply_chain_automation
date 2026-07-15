@@ -42,6 +42,7 @@ issuance_query = '''CREATE TABLE IF NOT EXISTS issuance(
     quantity            NUMERIC(14,3),
     status              TEXT,
     from_date           DATE,
+    unit_price          NUMERIC(14,3),
     total_price         NUMERIC(18,2),
     job_number          TEXT
 );'''
@@ -69,5 +70,24 @@ store_requisition_query = '''CREATE TABLE IF NOT EXISTS store_requisition(
     stock_in_date       DATE
 );'''
 
+#------------------------- PURCHASES DATA ------------------------------
+purchases_query = '''CREATE TABLE purchases_data(
+    ref_no      BIGSERIAL PRIMARY KEY, 		
+    qty         INT,	
+    branch      TEXT,
+    amount      NUMERIC(14,3),	
+    ppc_store   TEXT,	
+    required_d  DATE,		
+    purchase    DATE, 		
+    mop	        TEXT,
+    dc_no       TEXT,
+    bill_no     TEXT,	
+    sourcing_o  TEXT,
+    item_code   TEXT REFERENCES items(item_code),
+    supplier_id INT REFERENCES suppliers(supplier_id),
+    po_number   TEXT REFERENCES purchase_order(po_number)
+);
+'''
 
-stores_schemas_queries = [stock_query, issuance_query, store_requisition_query]
+
+stores_schemas_queries = [stock_query, purchases_query, issuance_query, store_requisition_query]

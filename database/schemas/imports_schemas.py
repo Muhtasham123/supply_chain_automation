@@ -32,15 +32,11 @@ suppliers_table_query = '''CREATE TABLE IF NOT EXISTS suppliers(
 # item_code is the natural business key and is referenced directly by
 # every transaction table (simpler for the loader than a generated id).
 items_table_query = '''CREATE TABLE IF NOT EXISTS items(
-    item_id             BIGSERIAL PRIMARY KEY,
-    item_code           TEXT UNIQUE NOT NULL,
+    item_code           TEXT PRIMARY KEY,
     item                TEXT,
     group_name          TEXT,
     material_standard   TEXT,
-    material            TEXT,
     uom                 TEXT,
-    standard_price      NUMERIC(18,2),          -- reference only
-    weight_kgs          NUMERIC(14,3),
     item_category       TEXT,
     specs               TEXT
 );'''
@@ -48,7 +44,6 @@ items_table_query = '''CREATE TABLE IF NOT EXISTS items(
 # ---------------------- PURCHASE ORDER -----------------------------------
 # Referenced by import_details and purchases. po_number is the natural key.
 purchase_order_table_query = '''CREATE TABLE IF NOT EXISTS purchase_order(
-    po_id           BIGSERIAL PRIMARY KEY,
     po_number       TEXT UNIQUE NOT NULL,
     po_date         DATE
 );'''

@@ -14,15 +14,9 @@ Requires:  pip install pandas openpyxl psycopg2-binary
 import re
 import pandas as pd
 from psycopg2.extras import execute_values
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent
-EXCEL_FILE = BASE_DIR.parent / "data" / "Qadri-Group-Logistics-Master.xlsx"
 
 # Values that mean "no data" in the workbook
 PLACEHOLDERS = {"-", "--", "---", "", "n/a", "na", "nil", "none", "tbd"}
-# NOTE: 'pending' is a placeholder only for DATE/NUMERIC columns;
-# for status columns it is a real value — clean_status() keeps it.
 
 
 # ---------------------------------------------------------------------------
@@ -140,9 +134,9 @@ def bulk_insert(conn, table, columns, rows, conflict_clause=""):
     print(f"  {table}: inserted {len(rows)} rows")
 
 
-def read_sheet(sheet_name) -> pd.DataFrame:
+def read_sheet(sheet_name, file_path) -> pd.DataFrame:
     """Read one worksheet with the header on the first row."""
-    df = pd.read_excel(EXCEL_FILE, sheet_name=sheet_name)
+    df = pd.read_excel(file_path, sheet_name=sheet_name)
     df = df.dropna(how="all")
     print(f"Read '{sheet_name}': {len(df)} rows, {len(df.columns)} columns")
     return df
