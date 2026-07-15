@@ -17,3 +17,9 @@ def execute_queries(queries_list, department_name, view_or_schema):
 execute_queries(logistics_schemas_queries, "Logistics", "schemas")
 
 execute_queries(logistics_views_queries, "Logistics", "views")
+from database.schemas.imports_schemas import imports_schemas_queries
+from database.schemas.stores_schemas import stores_schemas_queries
+
+# imports MUST run before stores — it creates the shared masters (items, suppliers, purchase_order)
+execute_queries(imports_schemas_queries, "Imports", "schemas")
+execute_queries(stores_schemas_queries, "Stores", "schemas")
