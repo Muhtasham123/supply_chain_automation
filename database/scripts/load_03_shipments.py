@@ -39,7 +39,7 @@ SHIPMENT_COLUMNS = [
     "net_weight_kgs", "gross_weight_kgs", "s_agent", "c_agent", "s_line",
     "cro_no", "lcl", "air", "qfl_arrival_date", "port_in_date",
     "cut_off_date", "etd_karachi", "cro_arrival_date", "actual_arrival_date",
-    "stuffing_location", "pick_up_time", "loading_time", "v_and_v_no",
+    "stuffing_location", "pick_up_time", "loading_t", "v_and_v_no",
     "quoted_sea_freight", "actual_sea_freight", "lhr_khi_cost",
     "fumigation_cost", "lashing_cost", "qfl_port_cost", "qfl_cost",
     "clearance_cost", "dhl_charges", "insurance", "wharfage","country", "pod"
