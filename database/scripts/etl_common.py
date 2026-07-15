@@ -90,8 +90,13 @@ def clean_date(value):
     """Coerce Excel datetimes / date strings to date; anything else -> None."""
     if value is None or (isinstance(value, float) and pd.isna(value)):
         return None
-    if isinstance(value, str) and value.strip().lower() in PLACEHOLDERS:
-        return None
+    if isinstance(value, str):
+        if value.strip().lower() in PLACEHOLDERS:
+            return None
+
+        # Remove any HTML that follows the date
+        value = value.split("<", 1)[0].strip()
+
     ts = pd.to_datetime(value, errors="coerce", dayfirst=True)
     return None if pd.isna(ts) else ts.date()
 
@@ -137,6 +142,7 @@ def bulk_insert(conn, table, columns, rows, conflict_clause=""):
 def read_sheet(sheet_name, file_path) -> pd.DataFrame:
     """Read one worksheet with the header on the first row."""
     df = pd.read_excel(file_path, sheet_name=sheet_name)
+    df.columns = df.columns.str.strip()
     df = df.dropna(how="all")
     print(f"Read '{sheet_name}': {len(df)} rows, {len(df.columns)} columns")
     return df

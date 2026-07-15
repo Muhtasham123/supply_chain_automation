@@ -20,14 +20,6 @@
 #  MASTER TABLES  (shared across all modules)
 # ============================================================
 
-# ---------------------- SUPPLIERS ----------------------------------------
-suppliers_table_query = '''CREATE TABLE IF NOT EXISTS suppliers(
-    supplier_id     BIGSERIAL PRIMARY KEY,
-    supplier_code   TEXT UNIQUE,        -- business supplier id from source; loader matches on this
-    supplier        TEXT NOT NULL,
-    country         TEXT
-);'''
-
 # ---------------------- ITEMS --------------------------------------------
 # item_code is the natural business key and is referenced directly by
 # every transaction table (simpler for the loader than a generated id).
@@ -44,10 +36,9 @@ items_table_query = '''CREATE TABLE IF NOT EXISTS items(
 # ---------------------- PURCHASE ORDER -----------------------------------
 # Referenced by import_details and purchases. po_number is the natural key.
 purchase_order_table_query = '''CREATE TABLE IF NOT EXISTS purchase_order(
-    po_number       TEXT UNIQUE NOT NULL,
+    po_number       TEXT PRIMARY KEY,
     po_date         DATE
 );'''
-
 
 # ============================================================
 #  IMPORTS MODULE
@@ -82,7 +73,9 @@ import_details_query = '''CREATE TABLE IF NOT EXISTS import_details(
     bill_submission_date_to_ac      DATE,
     current_status                  TEXT,
     remarks                         TEXT,
-    supplier_id                     BIGINT REFERENCES suppliers(supplier_id),
+    supplier                        TEXT,
+    supplier_country                TEXT,
+    supplier_city                   TEXT,
     po_number                       TEXT REFERENCES purchase_order(po_number)
 );'''
 
@@ -169,12 +162,12 @@ payment_history_query = '''CREATE TABLE IF NOT EXISTS payment_history(
     td_payment_status   TEXT,
     currency            TEXT,
     ex_rate             NUMERIC(14,4)
+
 );'''
 
 
 # Order matters: masters first, then import parent, then its children.
 imports_schemas_queries = [
-    suppliers_table_query,
     items_table_query,
     purchase_order_table_query,
     import_details_query,
