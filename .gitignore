@@ -1,2 +1,4 @@
 /venv
 database/data/
+/Project Files
+/connection/database_connection.py
