@@ -57,7 +57,7 @@ export_shipments_query = '''CREATE TABLE IF NOT EXISTS export_shipments(
     actual_arrival_date DATE,
     stuffing_location   TEXT,
     pick_up_time        TEXT,
-    loading_time        TEXT,
+    loading_t        TEXT,
     v_and_v_no          TEXT, 
     quoted_sea_freight  NUMERIC(18,2),
     actual_sea_freight  NUMERIC(18,2),

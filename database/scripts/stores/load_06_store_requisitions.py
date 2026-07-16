@@ -1,0 +1,39 @@
+"""Load the Main Store requisitions table"""
+
+import pandas as pd
+from database.scripts.etl_common import (
+    read_sheet, clean_text, clean_number, clean_date
+)
+from pathlib import Path
+
+EXCEL_FILE = Path.cwd() / "data" / "StoreRequisitionDetailExcel.xls"
+
+#Order of columns matters here (must be same as order of ROWS list)
+STORE_REQUISITION_COLUMNS = ["item_code", "ref_no", "department", "branch", "prepare_date", "description", "required_by",  "req_quantity", "pur_quantity", "pending_quantity", "last_purchase", "previous_price", "required_date", "status", "sourced_by", "previous_supplier", "original_required_date", "stock_in_date"]
+
+#--> Order must be same as columns order
+STORE_REQUISITION_HEADERS = [
+    ("Item Code", clean_text),	("Ref #", clean_text), ("Department", clean_text), ("Branch", clean_text),	("Prepare Date", clean_date), ("Description", clean_text), ("RequiredBy",clean_text), ("Req.Quantity", clean_number), ("Pur.Quantity", clean_number), ("Pending Quantity", clean_number), ("LastPurchase", clean_date), ("PreviousPrice", clean_text), ("RequiredDate", clean_date), ("Status", clean_text), ("SourcedBy", clean_text), ("PreviousSupplier", clean_text), ("Original Required", clean_date), ("Stock In Dat", clean_date)
+]
+
+def load_store_requisitions(conn):
+    df = read_sheet("Sheet1", EXCEL_FILE)
+    store_requisitions_rows = []
+
+    for _, row in df.iterrows():
+        row_tuple = ()
+        for header, cleaning_function in STORE_REQUISITION_HEADERS:
+            row_tuple = row_tuple + (cleaning_function(row.get(header)), )
+        store_requisitions_rows.append(row_tuple)
+    
+    with conn.cursor() as cur:
+        for row in store_requisitions_rows:
+            cur.execute(
+                f"INSERT INTO store_requisition ({', '.join(STORE_REQUISITION_COLUMNS)}) "
+                f"VALUES ({', '.join(['%s'] * len(STORE_REQUISITION_HEADERS))}) "
+                f"RETURNING req_id",
+                row
+            )
+
+    conn.commit()
+    print(f"Store Requisitions : inserted {len(store_requisitions_rows)} rows")

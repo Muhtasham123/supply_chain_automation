@@ -20,7 +20,7 @@ Usage:  python -m database.scripts.load_07_import_details
 """
 
 from database.scripts.etl_stores_imports import (
-    read_import_rows, import_ref_for, ensure_suppliers, bulk_insert,
+    read_import_rows, import_ref_for, bulk_insert,
     clean_text, clean_number, clean_date,
 )
 
@@ -38,6 +38,9 @@ DETAIL_MAP = [
     ("protocol_approval_date",     "Protocol Approval Date",      clean_date),
     ("req_date",                   "Req. Dt.",                    clean_date),
     ("lead_time",                  "Lead Time",                   clean_text),
+    ("supplier",                   "Supplier",                    clean_text),
+    ("supplier_country",           "Country",                     clean_text),
+    ("supplier_city",              "City",                        clean_text),
     ("gin_status",                 "GIN Status",                  clean_text),
     ("gin_date",                   "GIN Date",                    clean_date),
     ("total_value_fc",             "Total Value(FC)",             clean_number),
@@ -51,10 +54,11 @@ DETAIL_MAP = [
     ("bill_submission_date_to_ac", "Bill Submission Date to A/C", clean_date),
     ("current_status",             "Current Status",              clean_text),
     ("remarks",                    "Remarks",                     clean_text),
+    
 ]
 
 DETAIL_COLUMNS = (
-    ["import_ref"] + [db for db, _, _ in DETAIL_MAP] + ["supplier_id", "po_number"]
+    ["import_ref"] + [db for db, _, _ in DETAIL_MAP] + [ "po_number"]
 )
 
 
@@ -62,18 +66,18 @@ def load_import_details(conn):
     df = read_import_rows()
 
     # Ensure suppliers (idempotent) and get the {name: supplier_id} map.
-    supplier_map = ensure_suppliers(conn, [
-        {"supplier": clean_text(r.get("Supplier")),
-         "country":  clean_text(r.get("Country"))}
-        for _, r in df.iterrows()
-    ])
+    # supplier_map = ensure_suppliers(conn, [
+    #     {"supplier": clean_text(r.get("Supplier")),
+    #      "country":  clean_text(r.get("Country"))}
+    #     for _, r in df.iterrows()
+    # ])
 
     rows = []
     for idx, r in df.iterrows():
         detail = tuple(fn(r.get(excel)) for _, excel, fn in DETAIL_MAP)
-        supplier_id = supplier_map.get(clean_text(r.get("Supplier")))
+        #supplier_id = supplier_map.get(clean_text(r.get("Supplier")))
         po_number = clean_text(r.get("PO No"))
-        rows.append((import_ref_for(idx),) + detail + (supplier_id, po_number))
+        rows.append((import_ref_for(idx),) + detail + (po_number,))
 
     print(f"Imports (one per real row): {len(rows)}")
     bulk_insert(conn, "import_details", DETAIL_COLUMNS, rows)

@@ -26,7 +26,6 @@ LINE_MAP = [
     ("uom",                 "UOM",              clean_text),
     ("wt_per_pc_t",         "Wt./Pc T",         clean_number),
     ("unit_price",          "Unit Price",       clean_number),
-    ("line_value_fc",       "Line Value(FC)",   clean_number),   # absent in source -> NULL
     ("elc_amount_per_unit", "ELC Amount/Unit",  clean_number),
     ("alc_amount_per_unit", "ALC Amount/Unit2", clean_number),
     ("alc_status",          "ALC Status",       clean_text),
@@ -39,6 +38,7 @@ LINE_COLUMNS = ["import_id", "item_code"] + [db for db, _, _ in LINE_MAP]
 
 def load_import_items(conn):
     df = read_import_rows()
+    df.columns = df.columns.str.strip()
 
     # Top up items so every line's FK resolves.
     ensure_items(conn, [
@@ -48,6 +48,7 @@ def load_import_items(conn):
          "item_category": clean_text(r.get("Item Cateogry")),
          "specs":         clean_text(r.get("Specs/Standard"))}
         for _, r in df.iterrows()
+            
     ])
 
     import_map = load_import_map(conn)

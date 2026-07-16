@@ -22,6 +22,9 @@ Requires:  pip install pandas openpyxl xlrd psycopg2-binary
 
 import pandas as pd
 from psycopg2.extras import execute_values
+from pathlib import Path
+
+
 
 # Reuse the exact same cleaners the logistics loaders use.
 from database.scripts.etl_common import (
@@ -31,7 +34,8 @@ from database.scripts.etl_common import (
 # ---------------------------------------------------------------------------
 # Source files  (change the folder here once; every loader picks it up)
 # ---------------------------------------------------------------------------
-PROJECT_FILES = "/ProjectFiles"
+#PROJECT_FILES = "data"
+PROJECT_FILES = Path.cwd() / "data"
 
 IMPORT_FILE    = f"{PROJECT_FILES}/Import Status Sheet-2026-02 July.xlsx"
 STOCK_FILE     = f"{PROJECT_FILES}/Stock Value Report.xls"
@@ -94,8 +98,8 @@ def import_ref_for(idx) -> str:
 # so any loader can safely "ensure" the codes it needs, in any order.
 
 ITEM_COLUMNS = [
-    "item_code", "item", "group_name", "material_standard", "material",
-    "uom", "standard_price", "weight_kgs", "item_category", "specs",
+    "item_code", "item", "group_name", "material_standard",
+    "uom", "item_category", "specs",
 ]
 
 
@@ -129,36 +133,36 @@ def ensure_items(conn, records):
     print(f"  items: ensured {len(rows)} distinct item codes (existing kept)")
 
 
-def ensure_suppliers(conn, records) -> dict:
-    """Upsert suppliers and return {supplier_name: supplier_id} for FK lookup.
+# def ensure_suppliers(conn, records) -> dict:
+#     """Upsert suppliers and return {supplier_name: supplier_id} for FK lookup.
 
-    The source has no separate supplier code, so the supplier NAME doubles as
-    supplier_code — that gives a UNIQUE key for idempotent re-runs and a stable
-    handle to resolve import_details.supplier_id.
-    """
-    merged = {}
-    for rec in records:
-        name = rec.get("supplier")
-        if not name:
-            continue
-        cur = merged.setdefault(name, {"country": None})
-        if cur["country"] is None and rec.get("country") is not None:
-            cur["country"] = rec.get("country")
-    rows = [(name, name, m["country"]) for name, m in merged.items()]
-    if rows:
-        with conn.cursor() as cur:
-            execute_values(
-                cur,
-                "INSERT INTO suppliers (supplier_code, supplier, country) "
-                "VALUES %s ON CONFLICT (supplier_code) DO NOTHING",
-                rows, page_size=500,
-            )
-        conn.commit()
-    with conn.cursor() as cur:
-        cur.execute("SELECT supplier, supplier_id FROM suppliers")
-        supplier_map = {s: i for s, i in cur.fetchall()}
-    print(f"  suppliers: ensured {len(rows)} names (map size {len(supplier_map)})")
-    return supplier_map
+#     The source has no separate supplier code, so the supplier NAME doubles as
+#     supplier_code — that gives a UNIQUE key for idempotent re-runs and a stable
+#     handle to resolve import_details.supplier_id.
+#     """
+#     merged = {}
+#     for rec in records:
+#         name = rec.get("supplier")
+#         if not name:
+#             continue
+#         cur = merged.setdefault(name, {"country": None})
+#         if cur["country"] is None and rec.get("country") is not None:
+#             cur["country"] = rec.get("country")
+#     rows = [(name, name, m["country"]) for name, m in merged.items()]
+#     if rows:
+#         with conn.cursor() as cur:
+#             execute_values(
+#                 cur,
+#                 "INSERT INTO suppliers (supplier_code, supplier, country) "
+#                 "VALUES %s ON CONFLICT (supplier_code) DO NOTHING",
+#                 rows, page_size=500,
+#             )
+#         conn.commit()
+#     with conn.cursor() as cur:
+#         cur.execute("SELECT supplier, supplier_id FROM suppliers")
+#         supplier_map = {s: i for s, i in cur.fetchall()}
+#     print(f"  suppliers: ensured {len(rows)} names (map size {len(supplier_map)})")
+#     return supplier_map
 
 
 def ensure_purchase_orders(conn, records):

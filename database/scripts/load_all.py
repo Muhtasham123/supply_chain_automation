@@ -1,3 +1,15 @@
+from database.scripts.logistics.load_01_exports import load_exports
+from database.scripts.logistics.load_02_export_documentation import load_export_documenttion
+from database.scripts.logistics.load_03_shipments import load_export_shipments
+from database.scripts.logistics.load_04_packing import load_packing
+from database.scripts.logistics.load_05_shifting import load_shifting
+from database.scripts.stores.load_01_items import load_items
+from database.scripts.stores.load_03_purchase_order import load_purchase_orders
+from database.scripts.stores.load_02_purchases_data import load_purchases
+from database.scripts.stores.load_04_issuance import load_issuances
+from database.scripts.stores.load_06_store_requisitions import load_store_requisitions
+from database.scripts.stores.load_05_stock import load_stock
+
 """
 load_all.py — one-shot loader for the whole database (logistics + imports).
 
@@ -19,11 +31,11 @@ import database.scripts.etl_common as etl_common
 import database.scripts.etl_stores_imports as etl_si
 import database.scripts.load_06_import_masters as load_06
 
-from database.scripts.load_01_exports import load_exports
-from database.scripts.load_02_export_documentation import load_export_documenttion
-from database.scripts.load_03_shipments import load_export_shipments
-from database.scripts.load_04_packing import load_packing
-from database.scripts.load_05_shifting import load_shifting
+# from database.scripts.load_01_exports import load_exports
+# from database.scripts.load_02_export_documentation import load_export_documenttion
+# from database.scripts.load_03_shipments import load_export_shipments
+# from database.scripts.load_04_packing import load_packing
+# from database.scripts.load_05_shifting import load_shifting
 # Imports module
 from database.scripts.load_06_import_masters import load_import_masters
 from database.scripts.load_07_import_details import load_import_details
@@ -36,7 +48,7 @@ from database.connection.database_connection import connection
 # Point every loader at the real source workbooks (kept in Project Files/).
 # ---------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parents[2]          # D:/Work/QADBROS
-PROJECT_FILES = ROOT / "Project Files"
+PROJECT_FILES = ROOT / "data"
 
 etl_common.EXCEL_FILE = PROJECT_FILES / "Qadri-Group-Logistics-Master.xlsx"
 
@@ -65,6 +77,8 @@ def load_data(table_name, load_function):
         print(f"!! {table_name} FAILED — {type(exc).__name__}: {exc}")
 
 
+#--> Better not to change loading order
+
 truncate_transaction_tables()
 
 # --- Logistics ---
@@ -73,6 +87,12 @@ load_data("Exports Documentation", load_export_documenttion)
 load_data("Shipments from logistics", load_export_shipments)
 load_data("Packing", load_packing)
 load_data("Shifting", load_shifting)
+load_data("Items", load_items)
+load_data("Purchase Orders", load_purchase_orders)
+load_data("Purchases", load_purchases)
+load_data("Issuances", load_issuances)
+load_data("Stocks", load_stock)
+load_data("Store Requisitions", load_store_requisitions)
 
 # --- Imports (masters first: items / suppliers / purchase_order) ---
 load_data("Import Masters", load_import_masters)

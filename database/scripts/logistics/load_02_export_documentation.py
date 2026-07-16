@@ -26,6 +26,9 @@ from database.scripts.etl_common import (
     read_sheet, make_export_key, clean_text, clean_status, clean_date,
     load_export_map,
 )
+from pathlib import Path
+
+EXCEL_FILE = Path.cwd() / "data" / "Qadri-Group-Logistics-Master.xlsx"
 
 # Excel status column -> (party, document_type)
 STATUS_MAP = {
@@ -66,7 +69,7 @@ HEADER_MAP = [
 
 
 def load_export_documenttion(conn):
-    df = read_sheet("Export Documentation Database")
+    df = read_sheet("Export Documentation Database", EXCEL_FILE)
     export_map = load_export_map(conn)
     updates = []        # (shipping_term, ..., handed_over_to, export_id)
     document_rows = []  # (export_id, party, document_type, status)

@@ -14,11 +14,14 @@ from database.scripts.etl_common import (
     read_sheet, make_export_key, clean_key, clean_text,
     bulk_insert,
 )
+from pathlib import Path
+
+EXCEL_FILE = Path.cwd() / "data" / "Qadri-Group-Logistics-Master.xlsx"
 
 def load_exports(connection):
     consignments = {}   # (exp_no, batch_no) -> dict of attributes
 
-    def register(key, raw, customer=None, country=None, pod=None):
+    def register(key, raw, customer=None):
         if key is None:
             return
         rec = consignments.setdefault(
@@ -28,7 +31,7 @@ def load_exports(connection):
             rec["customer"] = customer
 
     # --- Export Documentation (has customer) ------------------------------
-    exp = read_sheet("Export Documentation Database")
+    exp = read_sheet("Export Documentation Database", EXCEL_FILE)
     for _, r in exp.iterrows():
         key = make_export_key(r.get("Exp. #"), r.get("Batch #"))
         register(
@@ -37,22 +40,22 @@ def load_exports(connection):
         )
 
     # --- Master Packing ----------------------------------------------------
-    pack = read_sheet("Master Packing Database")
-    for _, r in pack.iterrows():
-        key = make_export_key(r.get("Exp #"), r.get("Batch #"))
-        register(
-            key, clean_text(r.get("Primary Key")),
-            customer=clean_text(r.get("Customer")),
-        )
+    # pack = read_sheet("Master Packing Database")
+    # for _, r in pack.iterrows():
+    #     key = make_export_key(r.get("Exp #"), r.get("Batch #"))
+    #     register(
+    #         key, clean_text(r.get("Primary Key")),
+    #         customer=clean_text(r.get("Customer")),
+    #     )
 
     # --- Inbound & Outbound Shifting ---------------------------------------
-    shift = read_sheet("Inbound & Outbound Shifting")
-    for _, r in shift.iterrows():
-        key = make_export_key(r.get("Exp # or Key"), r.get("Batch #"))
-        register(key, clean_text(r.get("Primary Key")),
-                 customer=clean_text(r.get("Customer")))
+    # shift = read_sheet("Inbound & Outbound Shifting")
+    # for _, r in shift.iterrows():
+    #     key = make_export_key(r.get("Exp # or Key"), r.get("Batch #"))
+    #     register(key, clean_text(r.get("Primary Key")),
+    #              customer=clean_text(r.get("Customer")))
 
-    print(f"\nDistinct consignments found: {len(consignments)}")
+    # print(f"\nDistinct consignments found: {len(consignments)}")
 
     rows = [
         (exp_no, batch_no, rec["raw"], rec["customer"])

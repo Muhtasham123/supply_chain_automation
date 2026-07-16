@@ -20,6 +20,9 @@ from database.scripts.etl_common import (
     read_sheet, make_export_key, clean_text, clean_date, clean_number,
     clean_int, load_export_map, bulk_insert,
 )
+from pathlib import Path
+
+EXCEL_FILE = Path.cwd() / "data" / "Qadri-Group-Logistics-Master.xlsx"
 
 COLUMNS = [
     "export_id", "exp_batch_raw", "movement_type", "execution_date",
@@ -36,7 +39,7 @@ COLUMNS = [
 
 
 def load_shifting(conn):
-    df = read_sheet("Inbound & Outbound Shifting")
+    df = read_sheet("Inbound & Outbound Shifting", EXCEL_FILE)
     export_map = load_export_map(conn)
     rows = []
     linked = 0

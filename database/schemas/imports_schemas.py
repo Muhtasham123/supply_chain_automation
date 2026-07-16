@@ -20,27 +20,15 @@
 #  MASTER TABLES  (shared across all modules)
 # ============================================================
 
-# ---------------------- SUPPLIERS ----------------------------------------
-suppliers_table_query = '''CREATE TABLE IF NOT EXISTS suppliers(
-    supplier_id     BIGSERIAL PRIMARY KEY,
-    supplier_code   TEXT UNIQUE,        -- business supplier id from source; loader matches on this
-    supplier        TEXT NOT NULL,
-    country         TEXT
-);'''
-
 # ---------------------- ITEMS --------------------------------------------
 # item_code is the natural business key and is referenced directly by
 # every transaction table (simpler for the loader than a generated id).
 items_table_query = '''CREATE TABLE IF NOT EXISTS items(
-    item_id             BIGSERIAL PRIMARY KEY,
-    item_code           TEXT UNIQUE NOT NULL,
+    item_code           TEXT PRIMARY KEY,
     item                TEXT,
     group_name          TEXT,
     material_standard   TEXT,
-    material            TEXT,
     uom                 TEXT,
-    standard_price      NUMERIC(18,2),          -- reference only
-    weight_kgs          NUMERIC(14,3),
     item_category       TEXT,
     specs               TEXT
 );'''
@@ -48,11 +36,9 @@ items_table_query = '''CREATE TABLE IF NOT EXISTS items(
 # ---------------------- PURCHASE ORDER -----------------------------------
 # Referenced by import_details and purchases. po_number is the natural key.
 purchase_order_table_query = '''CREATE TABLE IF NOT EXISTS purchase_order(
-    po_id           BIGSERIAL PRIMARY KEY,
-    po_number       TEXT UNIQUE NOT NULL,
+    po_number       TEXT PRIMARY KEY,
     po_date         DATE
 );'''
-
 
 # ============================================================
 #  IMPORTS MODULE
@@ -74,6 +60,9 @@ import_details_query = '''CREATE TABLE IF NOT EXISTS import_details(
     protocol_approval_date          DATE,
     req_date                        DATE,
     lead_time                       TEXT,
+    supplier                        TEXT,
+    supplier_country                TEXT,
+    supplier_city                   TEXT,
     gin_status                      TEXT,
     gin_date                        DATE,
     total_value_fc                  NUMERIC(18,2),
@@ -87,7 +76,6 @@ import_details_query = '''CREATE TABLE IF NOT EXISTS import_details(
     bill_submission_date_to_ac      DATE,
     current_status                  TEXT,
     remarks                         TEXT,
-    supplier_id                     BIGINT REFERENCES suppliers(supplier_id),
     po_number                       TEXT REFERENCES purchase_order(po_number)
 );'''
 
@@ -100,7 +88,6 @@ import_item_query = '''CREATE TABLE IF NOT EXISTS import_item(
     uom                 TEXT,
     wt_per_pc_t         NUMERIC(14,3),          -- Wt./Pc T
     unit_price          NUMERIC(18,2),
-    line_value_fc       NUMERIC(18,2),
     elc_amount_per_unit NUMERIC(18,2),
     alc_amount_per_unit NUMERIC(18,2),
     alc_status          TEXT,
@@ -113,7 +100,6 @@ shipment_details_query = '''CREATE TABLE IF NOT EXISTS shipment_details(
     shipment_id                         BIGSERIAL PRIMARY KEY,
     import_id                           BIGINT NOT NULL REFERENCES import_details(import_id) ON DELETE CASCADE,
     batch_no                            TEXT,
-    batch_qty                           NUMERIC(14,3),
     total_value_fc_batch_wise           NUMERIC(18,2),
     total_value_pkr_batch_wise          NUMERIC(18,2),
     hs_code                             TEXT,
@@ -174,12 +160,12 @@ payment_history_query = '''CREATE TABLE IF NOT EXISTS payment_history(
     td_payment_status   TEXT,
     currency            TEXT,
     ex_rate             NUMERIC(14,4)
+
 );'''
 
 
 # Order matters: masters first, then import parent, then its children.
 imports_schemas_queries = [
-    suppliers_table_query,
     items_table_query,
     purchase_order_table_query,
     import_details_query,

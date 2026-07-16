@@ -23,7 +23,6 @@ from database.scripts.etl_stores_imports import (
 
 # (db column, excel column, cleaner) for the batch-level fields.
 SHIP_MAP = [
-    ("batch_qty",                           "Batch Qty",                  clean_number),  # absent in source -> NULL
     ("total_value_fc_batch_wise",           "Total Value(FC) Batch_Wise", clean_number),
     ("total_value_pkr_batch_wise",          "Total Value(PKR) Batch_Wise", clean_number),
     ("hs_code",                             "H.S. Code",                  clean_text),

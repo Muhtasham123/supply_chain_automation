@@ -21,14 +21,12 @@ stock_query = '''CREATE TABLE IF NOT EXISTS stock(
     stock_qty           NUMERIC(14,3),
     stock_qty_amount    NUMERIC(18,2),
     available_qty       NUMERIC(14,3),
-    available_amount    NUMERIC(18,2),
-    UNIQUE (item_code, branch)
+    available_amount    NUMERIC(18,2)
 );'''
 
 # ---------------------- ISSUANCE (consumption transactions) --------------
 issuance_query = '''CREATE TABLE IF NOT EXISTS issuance(
-    issuance_id         BIGSERIAL PRIMARY KEY,
-    issuance_code       TEXT UNIQUE,        -- IssuanceCode from source
+    issuance_code       TEXT PRIMARY KEY,        -- IssuanceCode from source
     item_code           TEXT REFERENCES items(item_code),
     department          TEXT,
     branch              TEXT,
@@ -42,6 +40,7 @@ issuance_query = '''CREATE TABLE IF NOT EXISTS issuance(
     quantity            NUMERIC(14,3),
     status              TEXT,
     from_date           DATE,
+    unit_price          NUMERIC(14,3),
     total_price         NUMERIC(18,2),
     job_number          TEXT
 );'''
@@ -60,14 +59,34 @@ store_requisition_query = '''CREATE TABLE IF NOT EXISTS store_requisition(
     pur_quantity        NUMERIC(14,3),
     pending_quantity    NUMERIC(14,3),
     last_purchase       DATE,
-    previous_price      NUMERIC(18,2),
+    previous_price      TEXT,
     required_date       DATE,
     status              TEXT,
     sourced_by          TEXT,
     previous_supplier   TEXT,
-    original_required   NUMERIC(14,3),
+    original_required_date   DATE,
     stock_in_date       DATE
 );'''
 
+#------------------------- PURCHASES DATA ------------------------------
+purchases_query = '''CREATE TABLE purchases_data(
+    purchase_id BIGSERIAL PRIMARY KEY,
+    ref_no      TEXT, 		
+    qty         INT,	
+    branch      TEXT,
+    amount      NUMERIC(14,3),	
+    ppc_store   DATE,	
+    required_d  DATE,		
+    purchase    DATE, 		
+    mop	        TEXT,
+    dc_no       TEXT,
+    bill_no     TEXT,	
+    sourcing_o  TEXT,
+    supplier    TEXT,
+    item_code   TEXT REFERENCES items(item_code),
+    po_number TEXT REFERENCES purchase_order(po_number)
+);
+'''
 
-stores_schemas_queries = [stock_query, issuance_query, store_requisition_query]
+
+stores_schemas_queries = [stock_query, purchases_query, issuance_query, store_requisition_query]

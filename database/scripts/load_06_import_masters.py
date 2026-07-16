@@ -19,8 +19,8 @@ Usage:  python -m database.scripts.load_06_import_masters
 
 from database.scripts.etl_stores_imports import (
     IMPORT_FILE, IMPORT_HEADER_ROW, read_report,
-    ensure_items, ensure_suppliers, ensure_purchase_orders,
-    clean_text, clean_number,
+    ensure_items, ensure_purchase_orders,
+    clean_text,
 )
 
 
@@ -36,15 +36,15 @@ def load_import_masters(conn):
             "item_category": clean_text(r.get("Item Cateogry")),   # source misspelling
             "specs":         clean_text(r.get("Specs/Standard")),
         })
-        supplier_records.append({
-            "supplier": clean_text(r.get("Supplier")),
-            "country":  clean_text(r.get("Country")),
-        })
+        # supplier_records.append({
+        #     "supplier": clean_text(r.get("Supplier")),
+        #     "country":  clean_text(r.get("Country")),
+        # })
         po_records.append({
             "po_number": clean_text(r.get("PO No")),
             "po_date":   None,   # the import sheet has no PO date column
         })
 
-    ensure_suppliers(conn, supplier_records)
+#    ensure_suppliers(conn, supplier_records)
     ensure_purchase_orders(conn, po_records)
     ensure_items(conn, item_records)
