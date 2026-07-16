@@ -20,23 +20,12 @@ ISSUANCE_HEADERS = [
 def load_issuances(conn):
     df = read_sheet("Sheet1", EXCEL_FILE)
     issuances_rows = []
-    issuance_code_history = []
-
-    with conn.cursor() as cur:
-        cur.execute(
-            'SELECT issuance_code from issuance' #--> get already existing issuances
-        )
-        issuance_code_history = [row[0] for row in cur.fetchall()]
 
     for _, row in df.iterrows():
-        if clean_text(row.get("IssuanceCode")) not in issuance_code_history:
-            issuance_code_history.append(clean_text(row.get("IssuanceCode")))
-            row_tuple = ()
-
-            for header, cleaning_function in ISSUANCE_HEADERS:
-                row_tuple = row_tuple + (cleaning_function(row.get(header)), )
-
-            issuances_rows.append(row_tuple)
+        row_tuple = ()
+        for header, cleaning_function in ISSUANCE_HEADERS:
+            row_tuple = row_tuple + (cleaning_function(row.get(header)), )
+        issuances_rows.append(row_tuple)
     
     with conn.cursor() as cur:
         for row in issuances_rows:

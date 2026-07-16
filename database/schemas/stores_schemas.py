@@ -26,7 +26,8 @@ stock_query = '''CREATE TABLE IF NOT EXISTS stock(
 
 # ---------------------- ISSUANCE (consumption transactions) --------------
 issuance_query = '''CREATE TABLE IF NOT EXISTS issuance(
-    issuance_code       TEXT PRIMARY KEY,        -- IssuanceCode from source
+    serial_no           BIGSERIAL PRIMARY KEY,
+    issuance_code       TEXT,   -- IssuanceCode from source
     item_code           TEXT REFERENCES items(item_code),
     department          TEXT,
     branch              TEXT,
@@ -69,7 +70,7 @@ store_requisition_query = '''CREATE TABLE IF NOT EXISTS store_requisition(
 );'''
 
 #------------------------- PURCHASES DATA ------------------------------
-purchases_query = '''CREATE TABLE purchases_data(
+purchases_query = '''CREATE TABLE IF NOT EXISTS purchases_data(
     purchase_id BIGSERIAL PRIMARY KEY,
     ref_no      TEXT, 		
     qty         INT,	
