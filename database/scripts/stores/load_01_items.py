@@ -7,12 +7,27 @@ import pandas as pd
 from database.scripts.etl_common import (
     read_sheet, clean_text,
 )
+
 from pathlib import Path
 
-EXCEL_FILE = Path.cwd() / "data" / "Item Database.xlsx"
-PURCHASES_EXCEL_FILE = Path.cwd() / "data" / "Purchases List Report.xls"
-STOCKS_EXCEL_FILE = Path.cwd() / "data" / "Stock Value Report.xls"
-STORE_REQUISITIONS_EXCEL_FILE = Path.cwd() / "data" / "StoreRequisitionDetailExcel.xls"
+folders = ["items_database", "purchases", "stocks", "store_requisitions"]
+file_names = {}
+for folder in folders:
+    directory = Path(f'C:\\Users\\hp\\Desktop\\internship\\project\\data\\{folder}')
+    files = list(directory.iterdir())
+
+    if folder == "items_database":
+        file_names["items_database"] = files[0]
+    
+    if folder == "purchases":
+        file_names["purchases"] = files[0]
+    
+    if folder == "stocks":
+        file_names["stocks"] = files
+    
+    if folder == "store_requisitions":
+        file_names["store_requisitions"] = files[0]
+
 
 #Order of columns matters here (must be same as order of columns in sheet)
 ITEMS_COLUMNS = [
@@ -20,10 +35,10 @@ ITEMS_COLUMNS = [
 ]
 
 def load_items(conn):
-    df = read_sheet("Sheet1", EXCEL_FILE)
-    purchases_df = read_sheet("Sheet1", PURCHASES_EXCEL_FILE)
-    stock_df = read_sheet("Sheet1", STOCKS_EXCEL_FILE)
-    store_req_df = read_sheet("Sheet1", STORE_REQUISITIONS_EXCEL_FILE)
+    df = read_sheet("Sheet1", file_names["items_database"])
+    purchases_df = read_sheet("Sheet1", file_names["purchases"])
+    stock_dfs = [read_sheet("Sheet1", file) for file in file_names["stocks"]]
+    store_req_df = read_sheet("Sheet1", file_names["store_requisitions"])
 
     item_codes_history = []
     items_rows = []
@@ -60,19 +75,20 @@ def load_items(conn):
                 clean_text(row.get("UOM")),
             ))
     
-    for _, row in stock_df.iterrows():
-        if clean_text(row.get("ItemCode")) not in item_codes_history:
-            item_codes_history.append(clean_text(row.get("ItemCode")))
-            items_rows.append((
-                clean_text(row.get("ItemCode")),
-                clean_text(row.get("Item")),
-                clean_text("-"), #--> Specs not specified in stocks
-                clean_text("-"),        #--> Group name not specified in stocks
-                clean_text("-"),   #--> Standard not specified in stocks
-                clean_text(row.get("Category")), 
-                clean_text("-"),   #--> UOM not specified in stocks
-            ))
-    
+    for stock_df in stock_dfs:
+        for _, row in stock_df.iterrows():
+            if clean_text(row.get("ItemCode")) not in item_codes_history:
+                item_codes_history.append(clean_text(row.get("ItemCode")))
+                items_rows.append((
+                    clean_text(row.get("ItemCode")),
+                    clean_text(row.get("Item")),
+                    clean_text("-"), #--> Specs not specified in stocks
+                    clean_text("-"),        #--> Group name not specified in stocks
+                    clean_text("-"),   #--> Standard not specified in stocks
+                    clean_text(row.get("Category")), 
+                    clean_text("-"),   #--> UOM not specified in stocks
+                ))
+                
     for _, row in store_req_df.iterrows():
         if clean_text(row.get("Item Code")) not in item_codes_history:
             item_codes_history.append(clean_text(row.get("Item Code")))

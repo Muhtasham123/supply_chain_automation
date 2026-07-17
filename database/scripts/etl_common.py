@@ -143,6 +143,8 @@ def read_sheet(sheet_name, file_path) -> pd.DataFrame:
     """Read one worksheet with the header on the first row."""
     df = pd.read_excel(file_path, sheet_name=sheet_name)
     df.columns = df.columns.str.strip()
+    df.columns = df.columns.str.replace("\n", " ", regex=False)
+    df.columns = df.columns.str.replace(r"\s+", " ", regex=True)
     df = df.dropna(how="all")
     print(f"Read '{sheet_name}': {len(df)} rows, {len(df.columns)} columns")
     return df

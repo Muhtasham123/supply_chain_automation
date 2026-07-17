@@ -5,8 +5,11 @@ from database.scripts.etl_common import (
     read_sheet, clean_text, clean_number, clean_date
 )
 from pathlib import Path
+directory = Path(r"C:\Users\hp\Desktop\internship\project\data\store_requisitions")
 
-EXCEL_FILE = Path.cwd() / "data" / "StoreRequisitionDetailExcel.xls"
+files = list(directory.iterdir())
+
+EXCEL_FILE = files[0]
 
 #Order of columns matters here (must be same as order of ROWS list)
 STORE_REQUISITION_COLUMNS = ["item_code", "ref_no", "department", "branch", "prepare_date", "description", "required_by",  "req_quantity", "pur_quantity", "pending_quantity", "last_purchase", "previous_price", "required_date", "status", "sourced_by", "previous_supplier", "original_required_date", "stock_in_date"]

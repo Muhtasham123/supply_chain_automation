@@ -31,16 +31,32 @@ from database.scripts.etl_common import (
     clean_text, clean_number, clean_int, clean_date, bulk_insert,
 )
 
-# ---------------------------------------------------------------------------
-# Source files  (change the folder here once; every loader picks it up)
-# ---------------------------------------------------------------------------
-#PROJECT_FILES = "data"
-PROJECT_FILES = Path.cwd() / "data"
+from pathlib import Path
 
-IMPORT_FILE    = f"{PROJECT_FILES}/Import Status Sheet-2026-02 July.xlsx"
-STOCK_FILE     = f"{PROJECT_FILES}/Stock Value Report.xls"
-ISSUANCE_FILE  = f"{PROJECT_FILES}/Issuance Detail Report.xls"
-STORE_REQ_FILE = f"{PROJECT_FILES}/StoreRequisitionDetailExcel.xls"
+folders = ["imports", "stocks", "issuances", "store_requisitions"]
+file_names = {}
+for folder in folders:
+    directory = Path(f'C:\\Users\\hp\\Desktop\\internship\\project\\data\\{folder}')
+    files = list(directory.iterdir())
+
+    if folder == "imports":
+        file_names["imports"] = files[0]
+        print(files[0])
+    
+    if folder == "stocks":
+        file_names["stocks"] = files[0]
+    
+    if folder == "issuances":
+        file_names["issuances"] = files[0]
+    
+    if folder == "store_requisitions":
+        file_names["store_requisitions"] = files[0]
+
+
+IMPORT_FILE    = file_names["imports"]
+STOCK_FILE     = file_names["stocks"]
+ISSUANCE_FILE  = file_names["issuances"]
+STORE_REQ_FILE = file_names["store_requisitions"]
 
 # The Import Status Sheet carries two banner rows above the real header.
 IMPORT_HEADER_ROW = 2
@@ -131,38 +147,6 @@ def ensure_items(conn, records):
         execute_values(cur, sql, rows, page_size=500)
     conn.commit()
     print(f"  items: ensured {len(rows)} distinct item codes (existing kept)")
-
-
-# def ensure_suppliers(conn, records) -> dict:
-#     """Upsert suppliers and return {supplier_name: supplier_id} for FK lookup.
-
-#     The source has no separate supplier code, so the supplier NAME doubles as
-#     supplier_code — that gives a UNIQUE key for idempotent re-runs and a stable
-#     handle to resolve import_details.supplier_id.
-#     """
-#     merged = {}
-#     for rec in records:
-#         name = rec.get("supplier")
-#         if not name:
-#             continue
-#         cur = merged.setdefault(name, {"country": None})
-#         if cur["country"] is None and rec.get("country") is not None:
-#             cur["country"] = rec.get("country")
-#     rows = [(name, name, m["country"]) for name, m in merged.items()]
-#     if rows:
-#         with conn.cursor() as cur:
-#             execute_values(
-#                 cur,
-#                 "INSERT INTO suppliers (supplier_code, supplier, country) "
-#                 "VALUES %s ON CONFLICT (supplier_code) DO NOTHING",
-#                 rows, page_size=500,
-#             )
-#         conn.commit()
-#     with conn.cursor() as cur:
-#         cur.execute("SELECT supplier, supplier_id FROM suppliers")
-#         supplier_map = {s: i for s, i in cur.fetchall()}
-#     print(f"  suppliers: ensured {len(rows)} names (map size {len(supplier_map)})")
-#     return supplier_map
 
 
 def ensure_purchase_orders(conn, records):

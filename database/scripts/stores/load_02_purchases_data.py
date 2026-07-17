@@ -6,8 +6,11 @@ from database.scripts.etl_common import (
     read_sheet, clean_text, clean_int, clean_date
 )
 from pathlib import Path
+directory = Path(r"C:\Users\hp\Desktop\internship\project\data\purchases")
 
-EXCEL_FILE = Path.cwd() / "data" / "Purchases List Report.xls"
+files = list(directory.iterdir())
+
+EXCEL_FILE = files[0]
 
 #Order of columns matters here (must be same as order of ROWS list)
 PURCHASES_COLUMNS = [

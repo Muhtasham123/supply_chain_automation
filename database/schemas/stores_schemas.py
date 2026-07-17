@@ -24,6 +24,17 @@ stock_query = '''CREATE TABLE IF NOT EXISTS stock(
     available_amount    NUMERIC(18,2)
 );'''
 
+
+# ---------------------- AB_ITEMS ----------------------------------------
+ab_items_query = '''CREATE TABLE IF NOT EXISTS ab_items(
+    item_code           TEXT REFERENCES items(item_code),
+    branch_name         TEXT,
+    rank                TEXT,
+    safety_days         INT,
+    lead_time_days      INT
+);'''
+
+
 # ---------------------- ISSUANCE (consumption transactions) --------------
 issuance_query = '''CREATE TABLE IF NOT EXISTS issuance(
     serial_no           BIGSERIAL PRIMARY KEY,
@@ -90,4 +101,4 @@ purchases_query = '''CREATE TABLE IF NOT EXISTS purchases_data(
 '''
 
 
-stores_schemas_queries = [stock_query, purchases_query, issuance_query, store_requisition_query]
+stores_schemas_queries = [stock_query, purchases_query, issuance_query, store_requisition_query, ab_items_query]

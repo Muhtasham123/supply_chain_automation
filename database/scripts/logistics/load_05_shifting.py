@@ -22,7 +22,11 @@ from database.scripts.etl_common import (
 )
 from pathlib import Path
 
-EXCEL_FILE = Path.cwd() / "data" / "Qadri-Group-Logistics-Master.xlsx"
+directory = Path(r"C:\Users\hp\Desktop\internship\project\data\logistics")
+
+files = list(directory.iterdir())
+
+EXCEL_FILE = files[0]
 
 COLUMNS = [
     "export_id", "exp_batch_raw", "movement_type", "execution_date",

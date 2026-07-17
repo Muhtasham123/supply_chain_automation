@@ -3,3 +3,6 @@ pandas
 openpyxl
 xlrd
 streamlit
+langchain
+langgraph
+langchain_community

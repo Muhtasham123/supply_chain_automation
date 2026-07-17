@@ -5,9 +5,13 @@ pd.set_option("display.max_columns", None)
 from database.scripts.etl_common import (
     read_sheet, clean_text, clean_int, clean_date, clean_number
 )
-from pathlib import Path
 
-EXCEL_FILE = Path.cwd() / "data" / "Issuance Detail Report.xls"
+from pathlib import Path
+directory = Path(r"C:\Users\hp\Desktop\internship\project\data\issuances")
+
+files = list(directory.iterdir())
+
+EXCEL_FILES = files
 
 #Order of columns matters here (must be same as order of ROWS list)
 ISSUANCE_COLUMNS = ["issuance_code", "item_code", "department", "branch", "issue_to_others",  "authorized_by", "issued_by", "received_by", "description", "ref_no", "demand_ref_no",       "quantity", "status", "from_date", "unit_price", "total_price", "job_number", ]
@@ -18,14 +22,18 @@ ISSUANCE_HEADERS = [
 ]
 
 def load_issuances(conn):
-    df = read_sheet("Sheet1", EXCEL_FILE)
+    dataframes = []
     issuances_rows = []
 
-    for _, row in df.iterrows():
-        row_tuple = ()
-        for header, cleaning_function in ISSUANCE_HEADERS:
-            row_tuple = row_tuple + (cleaning_function(row.get(header)), )
-        issuances_rows.append(row_tuple)
+    for file in EXCEL_FILES:
+        dataframes.append(read_sheet("Sheet1", file))
+
+    for df in dataframes:
+        for _, row in df.iterrows():
+            row_tuple = ()
+            for header, cleaning_function in ISSUANCE_HEADERS:
+                row_tuple = row_tuple + (cleaning_function(row.get(header)), )
+            issuances_rows.append(row_tuple)
     
     with conn.cursor() as cur:
         for row in issuances_rows:
