@@ -1,8 +1,6 @@
 /venv
 .env
 /data
-/connection/database_connection.py
-chatbot/config.py
 
 # Python bytecode / caches (never commit compiled files — they can embed secrets)
 __pycache__/
