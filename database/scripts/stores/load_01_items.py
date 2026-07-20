@@ -13,7 +13,9 @@ from pathlib import Path
 folders = ["items_database", "purchases", "stocks", "store_requisitions"]
 file_names = {}
 for folder in folders:
-    directory = Path(f'C:\\Users\\hp\\Desktop\\internship\\project\\data\\{folder}')
+    current_dir = Path(__file__).resolve().parent
+    directory = Path(current_dir.parents[2] / "data" / folder)
+
     files = list(directory.iterdir())
 
     if folder == "items_database":

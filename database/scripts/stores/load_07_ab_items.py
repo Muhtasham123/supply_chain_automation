@@ -5,7 +5,8 @@ from database.scripts.etl_common import (
     read_sheet, clean_text, clean_date, clean_int
 )
 from pathlib import Path
-directory = Path(r"C:\Users\hp\Desktop\internship\project\data\ab_items")
+current_dir = Path(__file__).resolve().parent
+directory = Path(current_dir.parents[2] / "data" / "ab_items")
 
 files = list(directory.iterdir())
 

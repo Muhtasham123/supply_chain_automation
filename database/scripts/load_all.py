@@ -72,12 +72,14 @@ execute_queries(stores_schemas_queries, "Stores", "schemas")
 # Point every loader at the real source workbooks (kept in Project Files/).
 # ---------------------------------------------------------------------------
 
-directory = Path(r"C:\Users\hp\Desktop\internship\project\data\logistics")
+current_dir = Path(__file__).resolve().parent
+directory = Path(current_dir.parents[2]/ "QADBROS" / "data" / "logistics")
+
 files = list(directory.iterdir())
 LOGISTICS_FILE = files[0]
 etl_common.EXCEL_FILE = LOGISTICS_FILE
 
-directory = Path(r"C:\Users\hp\Desktop\internship\project\data\imports")
+directory = Path(current_dir.parents[2]/ "QADBROS" / "data" / "imports")
 files = list(directory.iterdir())
 IMPORTS_FILE = files[0]
 

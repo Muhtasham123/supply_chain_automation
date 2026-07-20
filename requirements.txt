@@ -3,6 +3,12 @@ pandas
 openpyxl
 xlrd
 streamlit
-langchain
+plotly
+sqlalchemy
+python-dotenv
 langgraph
-langchain_community
+langchain
+langchain-core
+langchain-community
+langchain-google-genai
+langchain-openai

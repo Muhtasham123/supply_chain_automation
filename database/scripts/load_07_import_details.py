@@ -18,7 +18,7 @@ CASCADE before reloading.
 
 Usage:  python -m database.scripts.load_07_import_details
 """
-
+from forex_python.converter import CurrencyRates    
 from database.scripts.etl_stores_imports import (
     read_import_rows, import_ref_for, bulk_insert,
     clean_text, clean_number, clean_date,
@@ -53,6 +53,7 @@ DETAIL_MAP = [
     ("ca_bill_received_date",      "C/A Bill Received Date",      clean_date),
     ("bill_submission_date_to_ac", "Bill Submission Date to A/C", clean_date),
     ("current_status",             "Current Status",              clean_text),
+    ("currency",                    "Currency",                    clean_text),
     ("remarks",                    "Remarks",                     clean_text),
     
 ]

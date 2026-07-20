@@ -39,7 +39,6 @@ PAY_MAP = [
     ("imp_value",         "Imp Value",          clean_number),
     ("lc_payment_status", "LC Payment Status",  clean_text),
     ("td_payment_status", "T&D Payment Status", clean_text),
-    ("currency",          "Currency",           clean_text),
     ("ex_rate",           "Ex. Rate",           clean_number),
 ]
 

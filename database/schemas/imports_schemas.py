@@ -76,6 +76,7 @@ import_details_query = '''CREATE TABLE IF NOT EXISTS import_details(
     bill_submission_date_to_ac      DATE,
     current_status                  TEXT,
     remarks                         TEXT,
+    currency                        TEXT,
     po_number                       TEXT REFERENCES purchase_order(po_number)
 );'''
 
@@ -158,7 +159,6 @@ payment_history_query = '''CREATE TABLE IF NOT EXISTS payment_history(
     imp_value           NUMERIC(18,2),
     lc_payment_status   TEXT,
     td_payment_status   TEXT,
-    currency            TEXT,
     ex_rate             NUMERIC(14,4)
 
 );'''

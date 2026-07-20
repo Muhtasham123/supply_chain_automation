@@ -1,0 +1,69 @@
+1. Simple Data Retrieval (Current Status)
+
+* What is the current stock of silica sand?
+* What is the current stock of resin?
+* What is the current stock of Hard Coke Anode Butt?
+* What is the current stock of Hard Coke Italian?
+* What is the current stock of Intensifier?
+* What is the current stock of Coating?
+* What is the current stock of Hardner?
+* Who was the supplier for our last local purchase of resin?
+* What was the purchase rate for our last local order of resin?
+* When was the last time we purchased Hard Coke Italian locally?
+* How many import shipments of resin are currently ongoing?
+* When is the next import shipment of resin expected to arrive?
+
+---
+
+2. Historical & Usage Queries (Time-Based)
+
+* How much quantity of resin was issued in the last 2 weeks?
+* How much quantity of resin was issued in the last 6 months?
+* How much resin have we used since the start of this year?
+* How much Hard Coke Anode Butt was issued last month?
+* When was the last local purchase of Hardner made?
+* How much Coating was purchased locally in the last 90 days?
+
+---
+
+3. Average & Performance Calculations
+
+* What is our average per day issuance of resin?
+* What is the average daily usage rate of Hard Coke Italian?
+* What is the average monthly consumption of Intensifier?
+* What was the average lead time for our last 3 resin imports?
+* What is the average delay between the date a demand is placed for resin and when it is actually purchased?
+
+---
+
+4. Forecasting & Stock Days (Advanced Math)
+
+
+* What are the stock days for silica sand based on the 6-month average issuance?
+* What are the stock days for resin right now?
+* Keeping in mind the upcoming import shipment of resin, how many stock days will we have once it arrives?
+* If we include the upcoming import shipment of Hard Coke Anode Butt, how long will our total stock last?
+* How many days of stock do we have left for Coating?
+* Based on current usage patterns, on what exact date will we run out of Intensifier?
+* Keeping in mind the issuance pattern how much resin do you think we would use in the upcoming month?
+
+---
+
+5. Reordering & Lead Time Logic
+
+* Based on resin's lead time and safety days, when should we place the next order?
+* When should we place the next order for Hardner so we don’t fall below our safety stock?
+* If the lead time for Intensifier is 45 days, have we already missed the reorder window?
+* What is the safety stock threshold currently set for silica sand?
+
+---
+
+6. Critical & Risk-Assessment Alerts
+
+
+* Are any of our ongoing resin imports critical?
+* Is our resin stock currently at risk of stocking out before the next shipment arrives?
+* Which items in our inventory (Resin, Hard Coke, Intensifier, Coating, Hardner) are currently below their safety stock level?
+* Are there any delayed import shipments that put our production at risk?
+* If the upcoming import shipment of resin is delayed by 10 days, will we run out of stock?
+* Can we source resin locally keeping in view the local purchases in time before we go critical of the stock?
