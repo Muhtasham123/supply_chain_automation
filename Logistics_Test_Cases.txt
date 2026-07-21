@@ -1,0 +1,62 @@
+AI Logistics Chatbot - Executive Test Queries
+
+1.  Give me today’s logistics summary.
+2.  What is the current status of all logistics operations?
+3.  How are we performing this month?
+4.  Which shipments need immediate attention?
+5.  What are the biggest risks in logistics right now?
+6.  Track Export EXP-1025.
+7.  Tell me everything about Batch B-1045.
+8.  Which shipments are delayed?
+9.  Why is Batch B-2008 delayed?
+10. Which shipments are currently at the port?
+11. What’s currently happening in packing?
+12. What’s currently happening in transportation?
+13. Which shipments are currently on water?
+14. Which shipments are waiting for Gate-Out?
+15. Which shipments are waiting for customs clearance?
+16. Which customers have delayed shipments?
+17. Show customer-wise logistics performance.
+18. Which customer has the highest logistics cost?
+19. Which customer has the most pending shipments?
+20. Which customer is waiting for documentation?
+21. How much have we spent on logistics this month?
+22. What’s our total shipping cost?
+23. Compare actual vs budget logistics cost.
+24. Which shipment cost us the most?
+25. Where are we losing the most money in logistics?
+26. Which shipping agent performs the best?
+27. Which transporter performs the best?
+28. Which supplier is causing the most delays?
+29. Which works is performing the best?
+30. Which stage of logistics causes the most delays?
+31. Summarize today’s logistics activities.
+32. What should management focus on today?
+33. Give me an executive logistics report.
+34. What’s preventing us from shipping faster?
+35. Recommend actions to improve logistics performance.
+36. Which shipments are likely to be delayed?
+37. Which shipments will arrive next week?
+38. Which documentation should be completed today?
+39. Which shipments will miss their target sailing date?
+40. Predict logistics bottlenecks for the next seven days.
+41. Show me the logistics dashboard.
+42. Show logistics KPIs.
+43. Show the monthly logistics trend.
+44. Compare this month’s logistics performance with last month.
+45. Which department is behind schedule?
+46. Where are my shipments?
+47. Is anything stuck in the logistics process?
+48. What shipments are currently waiting?
+49. Which shipment is in trouble?
+50. Give me the complete picture of our logistics operations.
+51. Show all critical shipments.
+52. Which shipments are ready for dispatch?
+53. Which shipments are ready for delivery?
+54. Show the complete lifecycle of Exp # EXP-1001.
+55. Which export shipments are ready to sail?
+56. Which import shipments are nearing completion?
+57. Which shipments have incomplete documentation?
+58. Which shipments are waiting for bank approval?
+59. Which shipments have exceeded their target lead time?
+60. Give me an executive summary of the entire logistics department.

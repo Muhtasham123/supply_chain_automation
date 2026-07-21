@@ -20,6 +20,11 @@ Requires:  pip install pandas openpyxl xlrd psycopg2-binary
            (xlrd is needed for the old binary .xls report exports)
 """
 
+import json
+import re
+import urllib.request
+
+import openpyxl
 import pandas as pd
 from psycopg2.extras import execute_values
 from pathlib import Path
@@ -203,11 +208,75 @@ def load_shipment_by_import(conn) -> dict:
         return out
 
 
+# ---------------------------------------------------------------------------
+# Currency resolution + live PKR conversion (imports)
+# ---------------------------------------------------------------------------
+# Currency symbol -> ISO. ¥ (U+00A5) is Chinese Yuan (CNY) in this data, not JPY.
+_SYMBOL_TO_ISO = {"$": "USD", "¥": "CNY", "€": "EUR", "£": "GBP"}
+# Blank-Currency rows carry the symbol in the FC cell's number format, e.g.
+# [$$-409]=USD, [$¥-804]=CNY. pandas drops formats, so we read them via openpyxl.
+_FC_FMT_CUR = re.compile(r"\[\$([^\-\]]+)-[0-9A-Fa-f]+\]")
+
+
+def resolve_import_currencies(path=None) -> dict:
+    """{df_row_index: ISO} for the real import rows. Uses the Currency-column
+    symbol; when blank, reads the FC cell's [$sym-locale] format; defaults to USD."""
+    path = path or IMPORT_FILE
+    ws = openpyxl.load_workbook(path, data_only=True).active
+    hdr = {ws.cell(row=IMPORT_HEADER_ROW + 1, column=c).value: c
+           for c in range(1, ws.max_column + 1)}
+    cur_c, fc_c = hdr.get("Currency"), hdr.get("Total Value(FC)")
+    item_c, tab_c = hdr.get("Item Name"), hdr.get("Tab Status")
+    out = {}
+    for r in range(IMPORT_HEADER_ROW + 2, ws.max_row + 1):     # data starts Excel row 4
+        if (ws.cell(row=r, column=item_c).value is None
+                and ws.cell(row=r, column=tab_c).value is None):
+            continue
+        idx = r - (IMPORT_HEADER_ROW + 2)                       # -> DataFrame index
+        sym = ws.cell(row=r, column=cur_c).value
+        iso = None
+        if isinstance(sym, str) and sym.strip():
+            s = sym.strip()
+            iso = _SYMBOL_TO_ISO.get(s) or _SYMBOL_TO_ISO.get(s[-1])
+        else:                                                  # blank -> FC cell format
+            m = _FC_FMT_CUR.search(ws.cell(row=r, column=fc_c).number_format or "")
+            if m:
+                iso = _SYMBOL_TO_ISO.get(m.group(1).strip()[-1])
+            iso = iso or "USD"
+        out[idx] = iso
+    return out
+
+
+_FALLBACK_PKR = {"USD": 278.0, "CNY": 41.0, "EUR": 300.0, "GBP": 350.0}
+
+
+def get_pkr_rates(isos) -> dict:
+    """{ISO: PKR per 1 unit} from today's live rates (open.er-api.com, keyless,
+    includes PKR). Falls back to approximate hardcoded rates if the net is down."""
+    isos = {c for c in isos if c}
+    try:
+        with urllib.request.urlopen(
+                "https://open.er-api.com/v6/latest/USD", timeout=20) as resp:
+            data = json.load(resp)
+        rates = data["rates"]
+        pkr_per_usd = rates["PKR"]
+        out = {c: (1.0 if c == "PKR"
+                   else pkr_per_usd / rates[c] if rates.get(c)
+                   else _FALLBACK_PKR.get(c)) for c in isos}
+        print("  forex (live " + data.get("time_last_update_utc", "")[:16] + "): "
+              + ", ".join(f"{c}->PKR {out[c]:.3f}" for c in sorted(out) if out[c]))
+        return out
+    except Exception as exc:
+        print(f"  !! forex live fetch failed ({type(exc).__name__}); using fallback")
+        return {c: _FALLBACK_PKR.get(c) for c in isos}
+
+
 # Re-export the cleaners so loaders can import everything from one place.
 __all__ = [
     "IMPORT_FILE", "STOCK_FILE", "ISSUANCE_FILE", "STORE_REQ_FILE",
     "IMPORT_HEADER_ROW", "read_report", "read_import_rows", "import_ref_for",
     "ensure_items", "ensure_suppliers", "ensure_purchase_orders",
     "load_import_map", "load_shipment_map", "load_shipment_by_import",
+    "resolve_import_currencies", "get_pkr_rates",
     "clean_text", "clean_number", "clean_int", "clean_date", "bulk_insert",
 ]

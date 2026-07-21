@@ -18,10 +18,10 @@ CASCADE before reloading.
 
 Usage:  python -m database.scripts.load_07_import_details
 """
-from forex_python.converter import CurrencyRates    
 from database.scripts.etl_stores_imports import (
     read_import_rows, import_ref_for, bulk_insert,
     clean_text, clean_number, clean_date,
+    resolve_import_currencies, get_pkr_rates,
 )
 
 # (db column, excel column, cleaner) for the header-level fields.
@@ -44,7 +44,6 @@ DETAIL_MAP = [
     ("gin_status",                 "GIN Status",                  clean_text),
     ("gin_date",                   "GIN Date",                    clean_date),
     ("total_value_fc",             "Total Value(FC)",             clean_number),
-    ("total_value_pkr",            "Total Value(PKR)",            clean_number),
     ("docs_status",                "Docs Status",                 clean_text),
     ("account_approval",           "Account Approval",            clean_text),
     ("bank_approval",              "Bank Approval",               clean_text),
@@ -53,32 +52,38 @@ DETAIL_MAP = [
     ("ca_bill_received_date",      "C/A Bill Received Date",      clean_date),
     ("bill_submission_date_to_ac", "Bill Submission Date to A/C", clean_date),
     ("current_status",             "Current Status",              clean_text),
-    ("currency",                    "Currency",                    clean_text),
     ("remarks",                    "Remarks",                     clean_text),
     
 ]
 
 DETAIL_COLUMNS = (
-    ["import_ref"] + [db for db, _, _ in DETAIL_MAP] + [ "po_number"]
+    ["import_ref"] + [db for db, _, _ in DETAIL_MAP]
+    + ["po_number", "total_value_pkr", "currency"]
 )
 
 
 def load_import_details(conn):
     df = read_import_rows()
-
-    # Ensure suppliers (idempotent) and get the {name: supplier_id} map.
-    # supplier_map = ensure_suppliers(conn, [
-    #     {"supplier": clean_text(r.get("Supplier")),
-    #      "country":  clean_text(r.get("Country"))}
-    #     for _, r in df.iterrows()
-    # ])
+    currencies = resolve_import_currencies()
+    rates = get_pkr_rates(set(currencies.values()))
+    computed = 0
 
     rows = []
     for idx, r in df.iterrows():
         detail = tuple(fn(r.get(excel)) for _, excel, fn in DETAIL_MAP)
-        #supplier_id = supplier_map.get(clean_text(r.get("Supplier")))
         po_number = clean_text(r.get("PO No"))
-        rows.append((import_ref_for(idx),) + detail + (po_number,))
+        fc = clean_number(r.get("Total Value(FC)"))
+        existing_pkr = clean_number(r.get("Total Value(PKR)"))
+        iso = currencies.get(idx)
+        if existing_pkr not in (None, 0):
+            pkr = existing_pkr                        # keep the recorded value
+        elif fc not in (None, 0) and rates.get(iso):
+            pkr = round(fc * rates[iso], 2)           # compute missing at live rate
+            computed += 1
+        else:
+            pkr = existing_pkr                        # can't compute -> leave as-is
+        rows.append((import_ref_for(idx),) + detail + (po_number, pkr, iso))
 
-    print(f"Imports (one per real row): {len(rows)}")
+    print(f"Imports (one per real row): {len(rows)}; "
+          f"computed PKR for {computed} previously-missing")
     bulk_insert(conn, "import_details", DETAIL_COLUMNS, rows)
