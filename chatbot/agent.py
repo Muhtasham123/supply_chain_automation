@@ -74,12 +74,12 @@ def get_engine() -> Engine:
 def get_schema() -> str:
     """CREATE-TABLE statements for every table, for the LLM prompt.
 
-    Sample rows are intentionally OFF (sample_rows_in_table_info=0): they added
+    Sample rows are intentionally OFF (sample_rows_in_table_info=2): they added
     ~3,500 tokens to every SQL-generation call for little benefit — the system
     prompt already documents the tricky columns and their value formats. Dropping
     them makes each generation noticeably faster and cheaper."""
     from langchain_community.utilities import SQLDatabase
-    db = SQLDatabase(get_engine(), sample_rows_in_table_info=0)
+    db = SQLDatabase(get_engine(), sample_rows_in_table_info=2)
     return db.get_table_info()
 
 
